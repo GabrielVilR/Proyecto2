@@ -5,8 +5,8 @@
 #include <string.h>
 
 typedef struct {
-  floar color[3]={1.0,0.0,0.0};
-  int figura[]={200,100,50,30};
+  floar colors[3]={1.0,0.0,0.0};
+  int figursa[]={200,100,50,10};
   int cantidad = 1;
 } objet;
 
@@ -18,15 +18,18 @@ void get_first_intersection(int xe, int ye, int ze, int xd, int yd, int zd){
   long double tmin;
   interseccion = NULL;
   tmin = 999999;
-  for (int i; i<objet.cantidad){
-    esfera=objet.figura;
-    int xc=esfera[0];
-    int yc=esfera[1];
-    int zc=esfera[2];
-    int R = esfera[3];
-    float b = 2*(xd*(xe-xc)+yd*(ye-yc)+zd*(ze-zc));
-    float c = (xe-xc)*(xe-xc)+(ye-yc)*(ye-yc)+(ze-zc)*(ze-zc)+R*R;
-    float dis = b*b-4*c;
+  esfera=objet.figuras;
+  int cant = objet.cantidad;
+  //calculo para esferas
+  for (int i; i<cant*4; i=i+4){
+
+    int xc=esfera[i];
+    int yc=esfera[i+1];
+    int zc=esfera[i+2];
+    int R = esfera[i+3];
+    long double b = 2*(xd*(xe-xc)+yd*(ye-yc)+zd*(ze-zc));
+    long double c = (xe-xc)*(xe-xc)+(ye-yc)*(ye-yc)+(ze-zc)*(ze-zc)+R*R;
+    long double dis = b*b-4*c;
     if (dis==0){
       //interseccion=objet.color;
       distancia = (-b+sqrt(dis))/2;
@@ -49,7 +52,7 @@ void get_first_intersection(int xe, int ye, int ze, int xd, int yd, int zd){
     //calcular INTERSECCION
     if (interseccion!=NULL && distancia<tmin){
       tmin=distancia;
-      interseccion=objet.color;
+      interseccion=objet.colors;
     }
   }
   return (interseccion);
@@ -57,32 +60,34 @@ void get_first_intersection(int xe, int ye, int ze, int xd, int yd, int zd){
 
 void get_color_pixel(int xe, int ye, int ze, int xd, int yd, int zd){
   BACKGROUND[] = {0.0,0.0,0.0};
-  INTERSECCION *interseccion;
+  float *interseccion;
+  float *col;
   interseccion = get_first_intersection(xe,ye,ze,xd,yd,zd);
   if (!interseccion){
-    color = BACKGROUND;
+    col = BACKGROUND;
   }
   else {
-    color = interseccion;
+    col = interseccion;
   }
-  return(color);
+  return(col);
 }
 
 void basic(){
-  int xe = 100;
-  int ye = 100;
-  int ze = -100;
-  for (int i;i<hor;i++){
-    for(int j;j<ver;j++){
-      float xw = (i+1/2)*(xmax-xmin)/hor+xmin;
-      float xw = (j+1/2)*(ymax-ymin)/ver+ymin;
-      float zw = 0;
-      float L = sqrt((xw+xe)**2+(yw-ye)**2+(zw-ze)**2);
-      int xd = (xw-xe)/L;
-      int yd = (yw-ye)/L;
-      int zd = (zw-ze)/L;
+  int xe = 10;
+  int ye = 10;
+  int ze = -10;
+  float *color;
+  for (int i;i<1000;i++){
+    for(int j;j<1000;j++){
+      long double xw = (i+1/2)*(xmax-xmin)/hor+xmin;
+      long double yw = (j+1/2)*(ymax-ymin)/ver+ymin;
+      long double zw = 0;
+      long double L = sqrt((xw+xe)**2+(yw-ye)**2+(zw-ze)**2);
+      long double xd = (xw-xe)/L;
+      long double yd = (yw-ye)/L;
+      long double zd = (zw-ze)/L;
       color = get_color_pixel((xe,ye,ze),(xd,yd,zd));
-      frame_buffer[i][j]=color;
+      plot_pixel(i,j,color);
     }
   }
   //guardar imagen
